@@ -1,16 +1,42 @@
 #include <windows.h>
+#include <stdio.h>
 
 /* This is where all the input to the window goes to */
-LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam) {
+void Make_Calculator_Textboxes(HWND);
+HWND num1,num2;
+
+LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam){
 	switch(Message) {
-		
+		case WM_CREATE : {
+			Make_Calculator_Textboxes(hwnd);
+            break;
+		}
 		/* Upon destruction, tell the main thread to stop */
 		case WM_DESTROY: {
 			PostQuitMessage(0);
 			break;
 		}
-		
 		/* All other messages (a lot of them) are processed using default procedures */
+		case WM_COMMAND: {
+			char button_choose = LOWORD(wParam);
+			if (button_choose=='+' || button_choose=='-' || button_choose=='*' || button_choose=='/'){
+
+				char strnum1[10],strnum2[10],result[30];
+
+				GetWindowText(num1,strnum1,10);
+				GetWindowText(num2,strnum2,10);
+
+				if(button_choose=='+') sprintf(result, "%g", atof(strnum1)+atof(strnum2));
+				else if(button_choose=='-') sprintf(result, "%g", atof(strnum1)-atof(strnum2));
+				else if(button_choose=='*') sprintf(result, "%g", atof(strnum1)*atof(strnum2));
+				else if(button_choose=='/') sprintf(result, "%g", atof(strnum1)/atof(strnum2));
+
+				MessageBox(hwnd, result, "Result", MB_OK);
+			}
+
+			break;
+		}
+		
 		default:
 			return DefWindowProc(hwnd, Message, wParam, lParam);
 	}
@@ -31,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.hCursor	 = LoadCursor(NULL, IDC_ARROW);
 	
 	/* White, COLOR_WINDOW is just a #define for a system color, try Ctrl+Clicking it */
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wc.hbrBackground = CreateSolidBrush(RGB(57,255,20)); 
 	wc.lpszClassName = "WindowClass";
 	wc.hIcon	 = LoadIcon(NULL, IDI_APPLICATION); /* Load a standard icon */
 	wc.hIconSm	 = LoadIcon(NULL, IDI_APPLICATION); /* use the name "A" to use the project icon */
@@ -41,11 +67,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
-	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","Caption",WS_VISIBLE|WS_OVERLAPPEDWINDOW,
+	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE,"WindowClass","My Calculator",WS_VISIBLE|WS_SYSMENU,
 		CW_USEDEFAULT, /* x */
 		CW_USEDEFAULT, /* y */
-		640, /* width */
-		480, /* height */
+		250, /* width */
+		200, /* height */
 		NULL,NULL,hInstance,NULL);
 
 	if(hwnd == NULL) {
@@ -63,4 +89,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		DispatchMessage(&msg); /* Send it to WndProc */
 	}
 	return msg.wParam;
+}
+
+void Make_Calculator_Textboxes(HWND hwnd){
+	CreateWindow("static","-Please Input Two Numbers-", WS_VISIBLE|WS_CHILD|SS_CENTER,20,10,200,20,hwnd,NULL,NULL,NULL);
+
+	num1 = CreateWindow("EDIT","",WS_VISIBLE|WS_CHILD|ES_CENTER,45,40,150,25,hwnd,NULL,NULL,NULL);
+	num2 = CreateWindow("EDIT","",WS_VISIBLE|WS_CHILD|ES_CENTER,45,80,150,25,hwnd,NULL,NULL,NULL);
+
+	CreateWindow("BUTTON", "+", WS_VISIBLE|WS_CHILD,50,120,30,30,hwnd,(HMENU)'+',NULL,NULL);
+    CreateWindow("BUTTON", "-", WS_VISIBLE|WS_CHILD,85,120,30,30,hwnd,(HMENU)'-',NULL,NULL);
+    CreateWindow("BUTTON", "*", WS_VISIBLE|WS_CHILD,120,120,30,30,hwnd,(HMENU)'*',NULL,NULL);
+    CreateWindow("BUTTON", "/", WS_VISIBLE|WS_CHILD,155,120,30,30,hwnd,(HMENU)'/',NULL,NULL);
 }
