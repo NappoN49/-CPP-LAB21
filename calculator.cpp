@@ -26,12 +26,27 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT Message, WPARAM wParam, LPARAM lParam){
 				GetWindowText(num1,strnum1,10);
 				GetWindowText(num2,strnum2,10);
 
-				if(button_choose=='+') sprintf(result, "%g", atof(strnum1)+atof(strnum2));
-				else if(button_choose=='-') sprintf(result, "%g", atof(strnum1)-atof(strnum2));
-				else if(button_choose=='*') sprintf(result, "%g", atof(strnum1)*atof(strnum2));
-				else if(button_choose=='/') sprintf(result, "%g", atof(strnum1)/atof(strnum2));
-
-				MessageBox(hwnd, result, "Result", MB_OK);
+				if(button_choose=='+'){
+					sprintf(result, "%g", atof(strnum1)+atof(strnum2));
+					MessageBox(hwnd, result, "Result", MB_OK);
+				}
+				else if(button_choose=='-'){
+					sprintf(result, "%g", atof(strnum1)-atof(strnum2));
+					MessageBox(hwnd, result, "Result", MB_OK);
+				}
+				else if(button_choose=='*'){
+					sprintf(result, "%g", atof(strnum1)*atof(strnum2));
+					MessageBox(hwnd, result, "Result", MB_OK);
+				}
+				else if(button_choose=='/'){
+					if(atof(strnum2)==0){
+						MessageBox(hwnd, "undefined", "Result", MB_OK);
+					}
+					else{
+						sprintf(result, "%g", atof(strnum1)/atof(strnum2));
+						MessageBox(hwnd, result, "Result", MB_OK);
+					}
+				}
 			}
 
 			break;
